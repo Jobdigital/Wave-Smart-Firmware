@@ -1,0 +1,17 @@
+# .clang-format
+BasedOnStyle: Google
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+BreakBeforeBraces: Attach
+AllowShortFunctionsOnASingleLine: Empty
+ColumnLimit: 100
+SortIncludes: false
+SpacesInParentheses: false
+SpaceAfterCStyleCast: true
+Cpp11BracedListStyle: true
+IndentCaseLabels: true
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignTrailingComments: true
+ReflowComments: true
