@@ -9,9 +9,16 @@ void taskLedBluetooth(void* parameter) {
   }
 }
 
+volatile uint16_t DELAY_MS = 0;
+String            CKP1     = "";
+String            CMP1     = "";
+String            CMP2     = "";
+String            CMP3     = "";
+String            CMP4     = "";
+
 void taskDeviceEnable(void* parameter) {
   while (true) {
-    vTaskDelay(1 / portTICK_PERIOD_MS);
+    vTaskDelay((DELAY_MS <= 0 ? 1 : DELAY_MS) / portTICK_PERIOD_MS);
   }
 }
 
@@ -96,8 +103,10 @@ void setup() {
 
   BT.onAuthComplete([](bool success) {
     if (success) {
+      tone(BUZZER_PIN, 5000, 200);
       Serial.println("Dispositivo Bluetooth autenticado.");
     } else {
+      tone(BUZZER_PIN, 4000, 200);
       Serial.println("Fallo en la autenticación del dispositivo Bluetooth.");
     }
   });
@@ -162,8 +171,8 @@ void updateFirmware() {
 }
 
 void loop() {
-  if (!BT.available()) return;
-  switch (static_cast<Command>(BT.parseInt())) {
+  if (!BT.available() && !Serial.available()) return;
+  switch (static_cast<Command>(BT.readStringUntil('\n').toInt())) {
     case VERSION_FIRMWARE:
       Serial.println("Comando recibido: Solicitar versión de firmware.");
       BT.printf("%d\n", FIRMWARE_VERSION);
@@ -186,14 +195,87 @@ void loop() {
 
     case ENABLE_DEVICE:
       Serial.println("Comando recibido: Habilitar dispositivo.");
-      digitalWrite(ENABLE_PIN, HIGH);
-      BT.println("");
+      if (!digitalRead(ENABLE_PIN)) {
+        digitalWrite(ENABLE_PIN, HIGH);
+        tone(BUZZER_PIN, 1000, 200);
+        xTaskCreatePinnedToCore(taskDeviceEnable, "Device_Enable", 1024, NULL, 1, &taskDeviceEnableHandle, 1);
+        BT.println("");
+      } else {
+        BT.println("Ya habilitado");
+      }
       break;
 
     case DISABLE_DEVICE:
       Serial.println("Comando recibido: Deshabilitar dispositivo.");
-      digitalWrite(ENABLE_PIN, LOW);
-      BT.println("");
+      if (digitalRead(ENABLE_PIN)) {
+        digitalWrite(ENABLE_PIN, LOW);
+        if (taskDeviceEnableHandle != NULL) {
+          vTaskDelete(taskDeviceEnableHandle);
+          taskDeviceEnableHandle = NULL;
+        }
+        tone(BUZZER_PIN, 500, 200);
+        BT.println("");
+      } else {
+        BT.println("Ya deshabilitado");
+      }
+      break;
+
+    case SET_CKP1:
+      BT.println();
+      CKP1 = BT.readStringUntil('\n');
+      Serial.printf("Comando recibido: Establecer CKP1 a %s.\n", CKP1.c_str());
+      BT.println();
+      break;
+
+    case SET_CMP1:
+      BT.println();
+      CMP1 = BT.readStringUntil('\n');
+      Serial.printf("Comando recibido: Establecer CMP1 a %s.\n", CMP1.c_str());
+      BT.println();
+      break;
+
+    case SET_CMP2:
+      BT.println();
+      CMP2 = BT.readStringUntil('\n');
+      Serial.printf("Comando recibido: Establecer CMP2 a %s.\n", CMP2.c_str());
+      BT.println();
+      break;
+
+    case SET_CMP3:
+      BT.println();
+      CMP3 = BT.readStringUntil('\n');
+      Serial.printf("Comando recibido: Establecer CMP3 a %s.\n", CMP3.c_str());
+      BT.println();
+      break;
+
+    case SET_CMP4:
+      BT.println();
+      CMP4 = BT.readStringUntil('\n');
+      Serial.printf("Comando recibido: Establecer CMP4 a %s.\n", CMP4.c_str());
+      BT.println();
+      break;
+
+    case SET_DELAY:
+      BT.println();
+      try {
+        DELAY_MS = BT.readStringUntil('\n').toInt();
+        Serial.printf("Comando recibido: Establecer retardo a %d ms.\n", DELAY_MS);
+        BT.println();
+      } catch (const std::exception& e) {
+        Serial.printf("Error al establecer el retardo: %s.\n", e.what());
+        BT.printf("Error: %s\n", e.what());
+      }
+      break;
+
+    case CLEAR_SIGNALS:
+      Serial.println("Comando recibido: Limpiar señales.");
+      CKP1     = "";
+      CMP1     = "";
+      CMP2     = "";
+      CMP3     = "";
+      CMP4     = "";
+      DELAY_MS = 0;
+      BT.println();
       break;
   }
 }

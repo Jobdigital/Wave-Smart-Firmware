@@ -8,7 +8,7 @@
 constexpr unsigned long BAUD_RATE        = 115200;
 constexpr const char*   DEVICE_NAME      = "Wave Smart";
 constexpr const char*   DEVICE_PIN       = "0000";
-constexpr uint16_t      FIRMWARE_VERSION = 0;
+constexpr uint16_t      FIRMWARE_VERSION = 1;
 constexpr uint16_t      HARDWARE_VERSION = 1;
 
 constexpr uint8_t LED_BLUETOOTH_PIN = 02;
@@ -27,6 +27,13 @@ enum Command : uint8_t {
   UNIQUE_IDENTIFIER = 4,
   ENABLE_DEVICE     = 5,
   DISABLE_DEVICE    = 6,
+  SET_CKP1          = 7,
+  SET_CMP1          = 8,
+  SET_CMP2          = 9,
+  SET_CMP3          = 10,
+  SET_CMP4          = 11,
+  SET_DELAY         = 12,
+  CLEAR_SIGNALS     = 13,
 };
 
 BluetoothSerial BT;
