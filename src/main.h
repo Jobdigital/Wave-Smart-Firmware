@@ -18,8 +18,7 @@ constexpr uint8_t CMP2_PIN          = 25;
 constexpr uint8_t CMP3_PIN          = 27;
 constexpr uint8_t CMP4_PIN          = 26;
 constexpr uint8_t BUZZER_PIN        = 14;
-
-constexpr uint8_t ENABLE_PIN = 13;
+constexpr uint8_t ENABLE_PIN        = 13;
 
 enum Command : uint8_t {
   VERSION_FIRMWARE  = 1,

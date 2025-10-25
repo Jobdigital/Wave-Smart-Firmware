@@ -1,8 +1,7 @@
 #include <main.h>
 
 void taskLedBluetooth(void* parameter) {
-  (void) parameter;
-  for (;;) {
+  while (true) {
     digitalWrite(LED_BLUETOOTH_PIN, HIGH);
     vTaskDelay(500 / portTICK_PERIOD_MS);
     digitalWrite(LED_BLUETOOTH_PIN, LOW);
@@ -10,8 +9,14 @@ void taskLedBluetooth(void* parameter) {
   }
 }
 
-// Declarar taskLedBluetoothHandle como variable global para que sea accesible en la lambda
+void taskDeviceEnable(void* parameter) {
+  while (true) {
+    vTaskDelay(1 / portTICK_PERIOD_MS);
+  }
+}
+
 xTaskHandle taskLedBluetoothHandle = NULL;
+xTaskHandle taskDeviceEnableHandle = NULL;
 
 void setup() {
   // Inicializa la comunicación serial para depuración
@@ -103,6 +108,7 @@ void setup() {
       esp_restart();
     } else if (event == ESP_SPP_SRV_OPEN_EVT) {
       Serial.printf("Dispositivo Bluetooth conectado, handle: %d.\n", param->srv_open.handle);
+      tone(BUZZER_PIN, 5000, 200);
       if (taskLedBluetoothHandle != NULL) {
         vTaskDelete(taskLedBluetoothHandle);  // Detener la tarea de parpadeo del LED
         taskLedBluetoothHandle = NULL;
@@ -151,7 +157,7 @@ void updateFirmware() {
     ESP.restart();
   } else {
     Serial.printf("Error en la actualización de firmware: %s\n", Update.errorString());
-    BT.printf("Update Failed: %s\r\n", Update.errorString());
+    BT.printf("Update Failed: %s\n", Update.errorString());
   }
 }
 
