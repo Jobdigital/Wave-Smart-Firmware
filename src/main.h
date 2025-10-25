@@ -11,7 +11,7 @@ constexpr const char*   DEVICE_PIN       = "0000";
 constexpr uint16_t      FIRMWARE_VERSION = 0;
 constexpr uint16_t      HARDWARE_VERSION = 1;
 
-constexpr uint8_t LED_BLUETOOTH_PIN = 2;
+constexpr uint8_t LED_BLUETOOTH_PIN = 02;
 constexpr uint8_t CKP1_PIN          = 32;
 constexpr uint8_t CMP1_PIN          = 33;
 constexpr uint8_t CMP2_PIN          = 25;
@@ -19,10 +19,15 @@ constexpr uint8_t CMP3_PIN          = 27;
 constexpr uint8_t CMP4_PIN          = 26;
 constexpr uint8_t BUZZER_PIN        = 14;
 
+constexpr uint8_t ENABLE_PIN = 13;
+
 enum Command : uint8_t {
-  VERSION_FIRMWARE = 1,
-  VERSION_HARDWARE = 2,
-  UPDATE_FIRMWARE  = 3,
+  VERSION_FIRMWARE  = 1,
+  VERSION_HARDWARE  = 2,
+  UPDATE_FIRMWARE   = 3,
+  UNIQUE_IDENTIFIER = 4,
+  ENABLE_DEVICE     = 5,
+  DISABLE_DEVICE    = 6,
 };
 
 BluetoothSerial BT;

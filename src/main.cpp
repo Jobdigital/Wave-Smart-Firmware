@@ -10,8 +10,8 @@ void taskLedBluetooth(void* parameter) {
   }
 }
 
-// Declarar taskHandle como variable global para que sea accesible en la lambda
-xTaskHandle taskHandle = NULL;
+// Declarar taskLedBluetoothHandle como variable global para que sea accesible en la lambda
+xTaskHandle taskLedBluetoothHandle = NULL;
 
 void setup() {
   // Inicializa la comunicación serial para depuración
@@ -27,6 +27,7 @@ void setup() {
   pinMode(CMP2_PIN, OUTPUT);
   pinMode(CMP3_PIN, OUTPUT);
   pinMode(CMP4_PIN, OUTPUT);
+  pinMode(ENABLE_PIN, OUTPUT);
 
   tone(BUZZER_PIN, 4000, 500);
   delay(500);
@@ -77,12 +78,12 @@ void setup() {
   digitalWrite(LED_BLUETOOTH_PIN, LOW);
 
   // Inicializa Bluetooth Serial
-  taskHandle = NULL;
+  taskLedBluetoothHandle = NULL;
   try {
     BT.begin(DEVICE_NAME);  // Nombre del dispositivo Bluetooth
     BT.setPin(DEVICE_PIN);  // PIN para emparejamiento
     Serial.printf("Bluetooth Serial started, MAC: %s.\n", BT.getBtAddressString().c_str());
-    xTaskCreatePinnedToCore(taskLedBluetooth, "LED_Bluetooth", 1024, NULL, 1, &taskHandle, 1);
+    xTaskCreatePinnedToCore(taskLedBluetooth, "LED_Bluetooth", 1024, NULL, 1, &taskLedBluetoothHandle, 1);
   } catch (const std::exception& e) {
     Serial.printf("Error al iniciar Bluetooth Serial: %s.\n", e.what());
     while (true);  // Detener la ejecución si hay un error
@@ -102,9 +103,9 @@ void setup() {
       esp_restart();
     } else if (event == ESP_SPP_SRV_OPEN_EVT) {
       Serial.printf("Dispositivo Bluetooth conectado, handle: %d.\n", param->srv_open.handle);
-      if (taskHandle != NULL) {
-        vTaskDelete(taskHandle);  // Detener la tarea de parpadeo del LED
-        taskHandle = NULL;
+      if (taskLedBluetoothHandle != NULL) {
+        vTaskDelete(taskLedBluetoothHandle);  // Detener la tarea de parpadeo del LED
+        taskLedBluetoothHandle = NULL;
       }
       digitalWrite(LED_BLUETOOTH_PIN, HIGH);  // Encender el LED de Bluetooth
     }
@@ -119,7 +120,13 @@ void updateFirmware() {
 
   long firmwareLength = BT.parseInt();
   Serial.printf("Tamaño del firmware a actualizar: %d bytes.\n", firmwareLength);
-  BT.println(Update.begin(firmwareLength) ? "1" : "0");
+
+  if (Update.begin(firmwareLength) == false) {
+    Serial.println("No hay espacio suficiente para la actualización de firmware.");
+    BT.println("No hay espacio suficiente");
+    return;
+  }
+  BT.println();
 
   uint8_t* firmwareData = new uint8_t[1024];
   size_t   write        = 0;
@@ -140,7 +147,7 @@ void updateFirmware() {
   delete[] firmwareData;
   if (Update.end(true)) {
     Serial.println("Actualización de firmware completada. Reiniciando...");
-    BT.printf("Update Success. Rebooting...\r\n");
+    BT.println();
     ESP.restart();
   } else {
     Serial.printf("Error en la actualización de firmware: %s\n", Update.errorString());
@@ -164,6 +171,23 @@ void loop() {
     case UPDATE_FIRMWARE:
       Serial.println("Comando recibido: Iniciar actualización de firmware.");
       updateFirmware();
+      break;
+
+    case UNIQUE_IDENTIFIER:
+      Serial.println("Comando recibido: Solicitar identificador único.");
+      BT.println(ESP.getEfuseMac());
+      break;
+
+    case ENABLE_DEVICE:
+      Serial.println("Comando recibido: Habilitar dispositivo.");
+      digitalWrite(ENABLE_PIN, HIGH);
+      BT.println("");
+      break;
+
+    case DISABLE_DEVICE:
+      Serial.println("Comando recibido: Deshabilitar dispositivo.");
+      digitalWrite(ENABLE_PIN, LOW);
+      BT.println("");
       break;
   }
 }
