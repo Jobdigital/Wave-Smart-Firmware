@@ -17,8 +17,12 @@ String            CMP3     = "";
 String            CMP4     = "";
 
 void taskDeviceEnable(void* parameter) {
+  uint16_t index = 0;
   while (true) {
-    vTaskDelay((DELAY_MS <= 0 ? 1 : DELAY_MS) / portTICK_PERIOD_MS);
+    if (CKP1.length()) {
+      digitalWrite(CKP1_PIN, (CKP1.charAt(index % CKP1.length()) == '1') ? HIGH : LOW);
+    }
+    vTaskDelay(1 / portTICK_PERIOD_MS);
   }
 }
 
