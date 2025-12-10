@@ -28,7 +28,7 @@ void loop() {
   Serial.print(temperature);
   Serial.println(" *C");
 
-  auto groundHumidity = analogRead(HW103_PIN);
+  uint16_t groundHumidity = analogRead(HW103_PIN);
   Serial.print("Ground Humidity: ");
   Serial.println(groundHumidity);
 
