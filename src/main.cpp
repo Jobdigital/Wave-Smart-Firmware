@@ -53,11 +53,24 @@ void updateFirmware() {
 }
 
 volatile uint16_t DELAY_MS = 0;
-String            CKP1     = "";
-String            CMP1     = "";
-String            CMP2     = "";
-String            CMP3     = "";
-String            CMP4     = "";
+
+// Buffers binarios para señales PWM
+#define MAX_SIGNAL_LENGTH 512
+uint8_t  CKP1_buf[MAX_SIGNAL_LENGTH] = {0};
+uint8_t  CMP1_buf[MAX_SIGNAL_LENGTH] = {0};
+uint8_t  CMP2_buf[MAX_SIGNAL_LENGTH] = {0};
+uint8_t  CMP3_buf[MAX_SIGNAL_LENGTH] = {0};
+uint8_t  CMP4_buf[MAX_SIGNAL_LENGTH] = {0};
+uint16_t CKP1_len = 0, CMP1_len = 0, CMP2_len = 0, CMP3_len = 0, CMP4_len = 0;
+
+// Función para convertir String a buffer binario
+void parseSignal(const String& str, uint8_t* buf, uint16_t* len) {
+  *len = 0;
+  for (uint16_t i = 0; i < str.length() && i < MAX_SIGNAL_LENGTH; ++i) {
+    buf[i] = (str.charAt(i) == '1') ? 1 : 0;
+    (*len)++;
+  }
+}
 
 xTaskHandle taskLedBluetoothHandle              = NULL;
 xTaskHandle taskLoopBluetoothComunicationHandle = NULL;
@@ -108,40 +121,46 @@ void taskLoopBluetoothComunication(void* parameter) {
         }
         break;
 
-      case SET_CKP1:
+      case SET_CKP1: {
         BT.println();
-        CKP1 = BT.readStringUntil('\n');
-        Serial.printf("Comando recibido: Establecer CKP1 a %s.\n", CKP1.c_str());
-        BT.println();
-        break;
-
-      case SET_CMP1:
-        BT.println();
-        CMP1 = BT.readStringUntil('\n');
-        Serial.printf("Comando recibido: Establecer CMP1 a %s.\n", CMP1.c_str());
+        String temp = BT.readStringUntil('\n');
+        parseSignal(temp, CKP1_buf, &CKP1_len);
+        Serial.printf("Comando recibido: Establecer CKP1 a %s.\n", temp.c_str());
         BT.println();
         break;
-
-      case SET_CMP2:
+      }
+      case SET_CMP1: {
         BT.println();
-        CMP2 = BT.readStringUntil('\n');
-        Serial.printf("Comando recibido: Establecer CMP2 a %s.\n", CMP2.c_str());
-        BT.println();
-        break;
-
-      case SET_CMP3:
-        BT.println();
-        CMP3 = BT.readStringUntil('\n');
-        Serial.printf("Comando recibido: Establecer CMP3 a %s.\n", CMP3.c_str());
+        String temp = BT.readStringUntil('\n');
+        parseSignal(temp, CMP1_buf, &CMP1_len);
+        Serial.printf("Comando recibido: Establecer CMP1 a %s.\n", temp.c_str());
         BT.println();
         break;
-
-      case SET_CMP4:
+      }
+      case SET_CMP2: {
         BT.println();
-        CMP4 = BT.readStringUntil('\n');
-        Serial.printf("Comando recibido: Establecer CMP4 a %s.\n", CMP4.c_str());
+        String temp = BT.readStringUntil('\n');
+        parseSignal(temp, CMP2_buf, &CMP2_len);
+        Serial.printf("Comando recibido: Establecer CMP2 a %s.\n", temp.c_str());
         BT.println();
         break;
+      }
+      case SET_CMP3: {
+        BT.println();
+        String temp = BT.readStringUntil('\n');
+        parseSignal(temp, CMP3_buf, &CMP3_len);
+        Serial.printf("Comando recibido: Establecer CMP3 a %s.\n", temp.c_str());
+        BT.println();
+        break;
+      }
+      case SET_CMP4: {
+        BT.println();
+        String temp = BT.readStringUntil('\n');
+        parseSignal(temp, CMP4_buf, &CMP4_len);
+        Serial.printf("Comando recibido: Establecer CMP4 a %s.\n", temp.c_str());
+        BT.println();
+        break;
+      }
 
       case SET_DELAY:
         BT.println();
@@ -157,11 +176,16 @@ void taskLoopBluetoothComunication(void* parameter) {
 
       case CLEAR_SIGNALS:
         Serial.println("Comando recibido: Limpiar señales.");
-        CKP1     = "";
-        CMP1     = "";
-        CMP2     = "";
-        CMP3     = "";
-        CMP4     = "";
+        memset(CKP1_buf, 0, sizeof(CKP1_buf));
+        CKP1_len = 0;
+        memset(CMP1_buf, 0, sizeof(CMP1_buf));
+        CMP1_len = 0;
+        memset(CMP2_buf, 0, sizeof(CMP2_buf));
+        CMP2_len = 0;
+        memset(CMP3_buf, 0, sizeof(CMP3_buf));
+        CMP3_len = 0;
+        memset(CMP4_buf, 0, sizeof(CMP4_buf));
+        CMP4_len = 0;
         DELAY_MS = 0;
         BT.println();
         break;
@@ -285,12 +309,19 @@ uint16_t signalIndex = 0;
 uint64_t lastMicros  = micros();
 
 void loop() {
-  if (lastMicros + (DELAY_MS / (CKP1.length() > 0 ? CKP1.length() : 1)) < micros()) {
-    digitalWrite(CKP1_PIN, CKP1.length() > 0 ? CKP1.charAt(signalIndex % CKP1.length()) == '1' ? HIGH : LOW : LOW);
-    digitalWrite(CMP1_PIN, CMP1.length() > 0 ? CMP1.charAt(signalIndex % CMP1.length()) == '1' ? HIGH : LOW : LOW);
-    digitalWrite(CMP2_PIN, CMP2.length() > 0 ? CMP2.charAt(signalIndex % CMP2.length()) == '1' ? HIGH : LOW : LOW);
-    digitalWrite(CMP3_PIN, CMP3.length() > 0 ? CMP3.charAt(signalIndex % CMP3.length()) == '1' ? HIGH : LOW : LOW);
-    digitalWrite(CMP4_PIN, CMP4.length() > 0 ? CMP4.charAt(signalIndex % CMP4.length()) == '1' ? HIGH : LOW : LOW);
+  uint16_t maxLen = 1;
+  if (CKP1_len > maxLen) maxLen = CKP1_len;
+  if (CMP1_len > maxLen) maxLen = CMP1_len;
+  if (CMP2_len > maxLen) maxLen = CMP2_len;
+  if (CMP3_len > maxLen) maxLen = CMP3_len;
+  if (CMP4_len > maxLen) maxLen = CMP4_len;
+
+  if (lastMicros + (DELAY_MS / maxLen) < micros()) {
+    digitalWrite(CKP1_PIN, CKP1_len > 0 ? CKP1_buf[signalIndex % CKP1_len] ? HIGH : LOW : LOW);
+    digitalWrite(CMP1_PIN, CMP1_len > 0 ? CMP1_buf[signalIndex % CMP1_len] ? HIGH : LOW : LOW);
+    digitalWrite(CMP2_PIN, CMP2_len > 0 ? CMP2_buf[signalIndex % CMP2_len] ? HIGH : LOW : LOW);
+    digitalWrite(CMP3_PIN, CMP3_len > 0 ? CMP3_buf[signalIndex % CMP3_len] ? HIGH : LOW : LOW);
+    digitalWrite(CMP4_PIN, CMP4_len > 0 ? CMP4_buf[signalIndex % CMP4_len] ? HIGH : LOW : LOW);
     lastMicros = micros();
     signalIndex++;
   }
