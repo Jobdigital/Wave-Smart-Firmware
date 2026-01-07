@@ -8,7 +8,7 @@
 constexpr unsigned long BAUD_RATE        = 115200;
 constexpr const char*   DEVICE_NAME      = "Wave Smart";
 constexpr const char*   DEVICE_PIN       = "0000";
-constexpr uint16_t      FIRMWARE_VERSION = 1;
+constexpr uint16_t      FIRMWARE_VERSION = 2;
 constexpr uint16_t      HARDWARE_VERSION = 1;
 
 constexpr uint8_t LED_BLUETOOTH_PIN = 02;

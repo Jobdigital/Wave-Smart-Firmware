@@ -282,33 +282,16 @@ void setup() {
 }
 
 uint16_t signalIndex = 0;
+uint64_t lastMicros  = micros();
 
 void loop() {
-  if (CKP1.length() > 0) {
-    digitalWrite(CKP1_PIN, CKP1.charAt(signalIndex % CKP1.length()) == '1' ? HIGH : LOW);
-  } else {
-    digitalWrite(CKP1_PIN, LOW);
+  if (lastMicros + (DELAY_MS / (CKP1.length() > 0 ? CKP1.length() : 1)) < micros()) {
+    digitalWrite(CKP1_PIN, CKP1.length() > 0 ? CKP1.charAt(signalIndex % CKP1.length()) == '1' ? HIGH : LOW : LOW);
+    digitalWrite(CMP1_PIN, CMP1.length() > 0 ? CMP1.charAt(signalIndex % CMP1.length()) == '1' ? HIGH : LOW : LOW);
+    digitalWrite(CMP2_PIN, CMP2.length() > 0 ? CMP2.charAt(signalIndex % CMP2.length()) == '1' ? HIGH : LOW : LOW);
+    digitalWrite(CMP3_PIN, CMP3.length() > 0 ? CMP3.charAt(signalIndex % CMP3.length()) == '1' ? HIGH : LOW : LOW);
+    digitalWrite(CMP4_PIN, CMP4.length() > 0 ? CMP4.charAt(signalIndex % CMP4.length()) == '1' ? HIGH : LOW : LOW);
+    lastMicros = micros();
+    signalIndex++;
   }
-  if (CMP1.length() > 0) {
-    digitalWrite(CMP1_PIN, CMP1.charAt(signalIndex % CMP1.length()) == '1' ? HIGH : LOW);
-  } else {
-    digitalWrite(CMP1_PIN, LOW);
-  }
-  if (CMP2.length() > 0) {
-    digitalWrite(CMP2_PIN, CMP2.charAt(signalIndex % CMP2.length()) == '1' ? HIGH : LOW);
-  } else {
-    digitalWrite(CMP2_PIN, LOW);
-  }
-  if (CMP3.length() > 0) {
-    digitalWrite(CMP3_PIN, CMP3.charAt(signalIndex % CMP3.length()) == '1' ? HIGH : LOW);
-  } else {
-    digitalWrite(CMP3_PIN, LOW);
-  }
-  if (CMP4.length() > 0) {
-    digitalWrite(CMP4_PIN, CMP4.charAt(signalIndex % CMP4.length()) == '1' ? HIGH : LOW);
-  } else {
-    digitalWrite(CMP4_PIN, LOW);
-  }
-  delayMicroseconds(DELAY_MS > 0 ? DELAY_MS : 1);
-  signalIndex++;
 }
