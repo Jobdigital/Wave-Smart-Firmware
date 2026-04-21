@@ -102,7 +102,7 @@ void taskLoopBluetoothComunication(void* parameter) {
       case ENABLE_DEVICE:
         Serial.println("Comando recibido: Habilitar dispositivo.");
         if (!digitalRead(ENABLE_PIN)) {
-          digitalWrite(ENABLE_PIN, HIGH);
+          // digitalWrite(ENABLE_PIN, HIGH);
           tone(BUZZER_PIN, 1000, 200);
           BT.println("");
         } else {
@@ -113,7 +113,7 @@ void taskLoopBluetoothComunication(void* parameter) {
       case DISABLE_DEVICE:
         Serial.println("Comando recibido: Deshabilitar dispositivo.");
         if (digitalRead(ENABLE_PIN)) {
-          digitalWrite(ENABLE_PIN, LOW);
+          // digitalWrite(ENABLE_PIN, LOW);
           tone(BUZZER_PIN, 500, 200);
           BT.println("");
         } else {
@@ -215,7 +215,7 @@ void setup() {
   pinMode(CMP4_PIN, OUTPUT);
   pinMode(ENABLE_PIN, OUTPUT);
 
-  digitalWrite(ENABLE_PIN, LOW);  // Asegura que el dispositivo esté deshabilitado al inicio
+  digitalWrite(ENABLE_PIN, HIGH);  // Asegura que el dispositivo esté deshabilitado al inicio
 
   tone(BUZZER_PIN, 4000, 500);
   delay(500);
