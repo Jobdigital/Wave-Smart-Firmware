@@ -36,7 +36,6 @@ void updateFirmware() {
         write += Update.write(firmwareData + write, bytesRead - write);
       } while (write < bytesRead);
       BT.println();
-
       Serial.printf("Progreso de actualización: %d/%d bytes (%.2f%%)\n", Update.progress(), firmwareLength, (Update.progress() * 100.0) / firmwareLength);
     }
   }
