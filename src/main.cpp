@@ -166,7 +166,7 @@ void taskLoopBluetoothComunication(void* parameter) {
         BT.println();
         try {
           DELAY_MS = BT.readStringUntil('\n').toInt();
-          Serial.printf("Comando recibido: Establecer retardo a %d ms.\n", DELAY_MS);
+          Serial.printf("Comando recibido: Establecer retardo a %d microsegundos.\n", DELAY_MS);
           BT.println();
         } catch (const std::exception& e) {
           Serial.printf("Error al establecer el retardo: %s.\n", e.what());
@@ -195,7 +195,7 @@ void taskLoopBluetoothComunication(void* parameter) {
         BT.println("Comando desconocido");
         break;
     }
-    vTaskDelay(10 / portTICK_PERIOD_MS);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
   }
 }
 
@@ -316,7 +316,7 @@ void loop() {
   if (CMP3_len > maxLen) maxLen = CMP3_len;
   if (CMP4_len > maxLen) maxLen = CMP4_len;
 
-  if (lastMicros + (DELAY_MS / maxLen) < micros()) {
+  if (lastMicros + DELAY_MS < micros()) {
     digitalWrite(CKP1_PIN, CKP1_len > 0 ? CKP1_buf[signalIndex % CKP1_len] ? HIGH : LOW : LOW);
     digitalWrite(CMP1_PIN, CMP1_len > 0 ? CMP1_buf[signalIndex % CMP1_len] ? HIGH : LOW : LOW);
     digitalWrite(CMP2_PIN, CMP2_len > 0 ? CMP2_buf[signalIndex % CMP2_len] ? HIGH : LOW : LOW);
