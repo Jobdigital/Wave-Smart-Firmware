@@ -308,13 +308,6 @@ uint16_t signalIndex = 0;
 uint64_t lastMicros  = micros();
 
 void loop() {
-  uint16_t maxLen = 1;
-  if (CKP1_len > maxLen) maxLen = CKP1_len;
-  if (CMP1_len > maxLen) maxLen = CMP1_len;
-  if (CMP2_len > maxLen) maxLen = CMP2_len;
-  if (CMP3_len > maxLen) maxLen = CMP3_len;
-  if (CMP4_len > maxLen) maxLen = CMP4_len;
-
   if (lastMicros + DELAY_MS < micros()) {
     digitalWrite(CKP1_PIN, CKP1_len > 0 ? CKP1_buf[signalIndex % CKP1_len] ? HIGH : LOW : LOW);
     digitalWrite(CMP1_PIN, CMP1_len > 0 ? CMP1_buf[signalIndex % CMP1_len] ? HIGH : LOW : LOW);
