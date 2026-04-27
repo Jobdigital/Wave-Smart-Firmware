@@ -214,7 +214,7 @@ void setup() {
   pinMode(CMP4_PIN, OUTPUT);
   pinMode(ENABLE_PIN, OUTPUT);
 
-  digitalWrite(ENABLE_PIN, HIGH);  // Asegura que el dispositivo esté deshabilitado al inicio
+  digitalWrite(ENABLE_PIN, HIGH);  // Asegura que el dispositivo esté habilitado al inicio
 
   tone(BUZZER_PIN, 4000, 500);
   delay(500);
