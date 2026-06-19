@@ -100,24 +100,16 @@ void taskLoopBluetoothComunication(void* parameter) {
 
       case ENABLE_DEVICE:
         Serial.println("Comando recibido: Habilitar dispositivo.");
-        if (!digitalRead(ENABLE_PIN)) {
-          // digitalWrite(ENABLE_PIN, HIGH);
-          tone(BUZZER_PIN, 1000, 200);
-          BT.println("");
-        } else {
-          BT.println("Ya habilitado");
-        }
+        // digitalWrite(ENABLE_PIN, HIGH);
+        tone(BUZZER_PIN, 1000, 200);
+        BT.println("");
         break;
 
       case DISABLE_DEVICE:
         Serial.println("Comando recibido: Deshabilitar dispositivo.");
-        if (digitalRead(ENABLE_PIN)) {
-          // digitalWrite(ENABLE_PIN, LOW);
-          tone(BUZZER_PIN, 500, 200);
-          BT.println("");
-        } else {
-          BT.println("Ya deshabilitado");
-        }
+        // digitalWrite(ENABLE_PIN, LOW);
+        tone(BUZZER_PIN, 500, 200);
+        BT.println("");
         break;
 
       case SET_CKP1: {
