@@ -5,7 +5,7 @@ void setup() {
     Serial.begin(BAUD_RATE);
   }
 
-  wifiManager.autoConnect("ECOVERMIC");
+  WiFi.mode(WIFI_STA);  // explicitly set mode, esp defaults to STA+AP
 
   dht.begin();
   pinMode(LED_BUILTIN_PIN, OUTPUT);
@@ -19,6 +19,15 @@ void setup() {
   lcd.setCursor(0, 1);
   lcd.print("a Ecovermic!");
   delay(3000);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Conectate a Ecovermic");
+  lcd.setCursor(0, 1);
+  lcd.print("para configurar WiFi");
+
+  // wm.setConfigPortalBlocking(false);
+  wm.autoConnect("ECOVERMIC");
 }
 
 void loop() {

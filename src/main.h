@@ -6,7 +6,7 @@
 #include <LiquidCrystal.h>
 #include <WiFiManager.h>  //https://github.com/tzapu/WiFiManager WiFi Configuration Magic
 
-WiFiManager wifiManager;
+WiFiManager wm;
 
 constexpr unsigned long BAUD_RATE = 115200;
 
