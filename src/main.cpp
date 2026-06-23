@@ -20,13 +20,31 @@ void setup() {
   lcd.print("a Ecovermic!");
   delay(3000);
 
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Conectate a Ecovermic");
-  lcd.setCursor(0, 1);
-  lcd.print("para configurar WiFi");
+  wm.setWebServerCallback([]() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Conectate a Ecovermic");
+    lcd.setCursor(0, 1);
+    lcd.print("para configurar WiFi");
+  });
 
-  // wm.setConfigPortalBlocking(false);
+  wm.setAPCallback([](WiFiManager *myWiFiManager) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Conectado a WiFi");
+    lcd.setCursor(0, 1);
+    lcd.print("SSID: ");
+    lcd.print(myWiFiManager->getConfigPortalSSID());
+  });
+
+  wm.setSaveConfigCallback([]() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Guardando WiFi");
+    lcd.setCursor(0, 1);
+    lcd.print("y reiniciando...");
+  });
+
   wm.autoConnect("ECOVERMIC");
 }
 
