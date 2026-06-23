@@ -5,6 +5,8 @@ void setup() {
     Serial.begin(BAUD_RATE);
   }
 
+  wifiManager.autoConnect("ECOVERMIC");
+
   dht.begin();
   pinMode(LED_BUILTIN_PIN, OUTPUT);
   digitalWrite(LED_BUILTIN_PIN, HIGH);
@@ -45,5 +47,5 @@ void loop() {
   lcd.setCursor(0, 1);
   lcd.printf("GH: %d%%", groundHumidity);
 
-  delay(2000);
+  delay(1000 * 60 * 60);  // 1 hour
 }
