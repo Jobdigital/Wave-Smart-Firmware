@@ -74,5 +74,5 @@ void loop() {
   lcd.setCursor(0, 1);
   lcd.printf("GH: %d%%", groundHumidity);
 
-  delay(1000 * 60 * 60);  // 1 hour
+  delay(1000 * 5);  // 5 seconds
 }
